@@ -11,10 +11,13 @@ public class Main {
 
     public static boolean solution(String[] phone_book) {
         Map<String, Integer> phoneBook = new HashMap<>();
-
+        int minimuxLength = 20;
         //가능한 조합을 모두 저장한다 단, 자기 자신은 저장하지 않는다. 진부분 집합만 저장
         for (String num : phone_book) {
-            for (int i = num.length() - 1; i > 0; i--) {
+            if (num.length() < minimuxLength) {
+                minimuxLength = num.length();
+            }
+            for (int i = num.length() - 1; i >= minimuxLength; i--) {
                 phoneBook.put(num.substring(0, i), 1);
             }
         }
@@ -26,7 +29,7 @@ public class Main {
             }
         }
 
-        //System.out.println(phoneBook);
+        System.out.println(phoneBook);
 
         return true;
     }
