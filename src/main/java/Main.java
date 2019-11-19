@@ -4,8 +4,8 @@ public class Main {
 
     public static void main(String[] args) {
         Solution sc = new Solution();
-        String[] genres = {"classic", "pop", "classic", "classic", "pop"};
-        int[] plays = {500, 600, 150, 800, 2500};
+        String[] genres = {"classic", "pop", "classic", "pop", "classic", "classic"};
+        int[] plays = {400, 600, 150, 2500, 500, 500};
         System.out.println(Arrays.toString(sc.solution(genres, plays)));
     }
 
@@ -28,53 +28,29 @@ public class Main {
 //            sortedMap.values().stream().forEach(System.out::println);
 
             List<Integer> result = new ArrayList<>();
-            List<Song> songs = null;
+            Map<Integer, Integer> songMap = null;
             for (String genre : sortedMap.keySet()) {
-                songs = new ArrayList<>();
+                songMap = new HashMap<>();
                 for (int i = 0; i < genres.length; i++) {
                     if (genres[i].equals(genre)) {
-                        songs.add(new Song(i, plays[i]));
+                        songMap.put(i, plays[i]);
                     }
                 }
 
-                songs.sort(new Comparator<Song>() {
-                    @Override
-                    public int compare(Song arg0, Song arg1) {
-                        int age0 = arg0.getPlays();
-                        int age1 = arg1.getPlays();
+                LinkedHashMap<Integer, Integer> resultMap = sortHashMapByIntegerValues((HashMap<Integer, Integer>) songMap);
 
-                        // 앞에 있는게 클때 양수 -> 오름차순
-                        // 앞에 있는게 클때 음수 -> 내림차순
-                        if (age0 == age1) return 0;
-                        else if (age0 > age1) return -1;
-                        else return 1;
+                int count = 0;
+                for(int i : resultMap.keySet()){
+                    if(count > 1) break;
+                    if(count == 0) {
+                        result.add(i);
                     }
-                });
-
-                if(songs.size() < 2) {
-                    if(songs.get(0).getPlays() == songs.get(1).getPlays()){
-                        if(songs.get(0).getNumber() > songs.get(1).getNumber()){
-                            result.add(songs.get(1).getNumber());
-                        } else {
-                            result.add(songs.get(0).getNumber());
-                        }
-                    } else {
-                        result.add(songs.get(0).getNumber());
+                    if(count == 1) {
+                        result.add(i);
                     }
-                } else {
-                    if(songs.get(0).getPlays() == songs.get(1).getPlays()){
-                        if(songs.get(0).getNumber() > songs.get(1).getNumber()){
-                            result.add(songs.get(1).getNumber());
-                            result.add(songs.get(0).getNumber());
-                        } else {
-                            result.add(songs.get(0).getNumber());
-                            result.add(songs.get(1).getNumber());
-                        }
-                    } else {
-                        result.add(songs.get(0).getNumber());
-                        result.add(songs.get(1).getNumber());
-                    }
+                    count++;
                 }
+
                 //specific.stream().(p -> result.add(songMap.get(p)));
             }
 
@@ -117,22 +93,34 @@ public class Main {
             return sortedMap;
         }
 
-        public static class Song {
-            private int number;
-            private int plays;
+        public LinkedHashMap<Integer, Integer> sortHashMapByIntegerValues(
+                HashMap<Integer, Integer> passedMap) {
+            List<Integer> mapKeys = new ArrayList<>(passedMap.keySet());
+            List<Integer> mapValues = new ArrayList<>(passedMap.values());
+            Collections.sort(mapValues, Collections.reverseOrder());
+            Collections.sort(mapKeys);
 
-            public Song(int number, int plays) {
-                this.number = number;
-                this.plays = plays;
-            }
+            LinkedHashMap<Integer, Integer> sortedMap =
+                    new LinkedHashMap<>();
 
-            public int getNumber() {
-                return number;
-            }
+            Iterator<Integer> valueIt = mapValues.iterator();
+            while (valueIt.hasNext()) {
+                Integer val = valueIt.next();
+                Iterator<Integer> keyIt = mapKeys.iterator();
 
-            public int getPlays() {
-                return plays;
+                while (keyIt.hasNext()) {
+                    Integer key = keyIt.next();
+                    Integer comp1 = passedMap.get(key);
+                    Integer comp2 = val;
+
+                    if (comp1.equals(comp2)) {
+                        keyIt.remove();
+                        sortedMap.put(key, val);
+                        break;
+                    }
+                }
             }
+            return sortedMap;
         }
 
     }
